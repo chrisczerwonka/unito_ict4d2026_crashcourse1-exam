@@ -9,7 +9,7 @@
         header { text-align: center; margin-bottom: 50px; }
         h1 { color: #2c3e50; margin-bottom: 10px; }
         .description { font-size: 1.2em; color: #555; max-width: 700px; margin: 0 auto; }
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
         .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); text-align: center; text-decoration: none; color: #2c3e50; transition: transform 0.2s, box-shadow 0.2s; }
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
         .card h3 { margin-top: 0; color: #2980b9; }
@@ -39,6 +39,10 @@
     </section>
 
     <section class="card-grid">
+        <a href="strategy.html" class="card">
+            <h3>Proposal Strategy</h3>
+            <p>Read our strategic response to the EBI RFP for education continuity.</p>
+        </a>
         <a href="map/" class="card">
             <h3>Interactive Risk Map</h3>
             <p>Visualize school facilities and track their proximity to reported conflict events.</p>

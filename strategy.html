@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Strategy: Sahel Education Continuity</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: #f4f7f6; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #2980b9; text-decoration: none; font-weight: bold; }
+        .back-link:hover { text-decoration: underline; }
+        .content-section { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        h2 { color: #2980b9; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-top: 30px; }
+        h3 { color: #2c3e50; margin-top: 25px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; border: 1px solid #eee; text-align: left; }
+        th { background: #f8f9fa; color: #2c3e50; }
+        .rfp-link { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2980b9; margin: 20px 0; font-style: italic; }
+        footer { margin-top: 60px; text-align: center; font-size: 0.9em; color: #95a5a6; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="back-link">← Back to Portal</a>
+        <h1>Proposal Strategy: Sahel Education Continuity</h1>
+        <p class="description">A data-driven response to the challenge of education disruption in conflict zones.</p>
+    </header>
+
+    <main class="content-section">
+        <div class="rfp-link">
+            This strategy is submitted in response to the <strong><a href="https://clombion.github.io/Turin2026-crash-course/site/resource.html?doc=exam-RFP" target="_blank">Education Bridge Initiative (EBI) RFP: Strengthening Education Continuity in Conflict-Affected Regions</a></strong>.
+        </div>
+
+        <h2>1. Context</h2>
+        <p>Humanitarian teams in the Sahel possess deep, localized knowledge of the security challenges facing education. However, as conflict events accelerate and displacement patterns shift, this informal knowledge often remains fragmented. There is a critical gap: the lack of a <strong>systematic, data-driven monitoring layer</strong> that can objectively flag infrastructure at risk across vast and insecure territories like the Burkina Faso-Mali-Niger border regions.</p>
+        <p>Our project aims to bridge this gap. We don't replace field expertise; we empower it by transforming raw conflict data and school registries into <strong>comparable, actionable risk metrics</strong>. By establishing a baseline of "proximity-to-conflict," we enable EBI to move from reactive crisis response to <strong>anticipatory continuity planning</strong>.</p>
+
+        <h2>2. Objectives</h2>
+        <ol>
+            <li><strong>Develop a Proximity-Based Monitoring Strategy:</strong> Establish a rigorous data pipeline that identifies schools within high-risk zones (5km) based on real-time conflict event monitoring.</li>
+            <li><strong>Create Actionable Visual Tools:</strong> Build an interactive portal that allows EBI staff to visualize the "risk landscape" and prioritize schools for emergency learning kits, teacher support, or temporary relocation.</li>
+            <li><strong>Ensure Operational Sustainability:</strong> Provide the methodology and automation scripts necessary for EBI to maintain and update the risk mapping independently as new data becomes available.</li>
+        </ol>
+
+        <h2>3. Approach</h2>
+        <h3>Strategic Rationale</h3>
+        <p>We focus on <strong>proximity monitoring</strong> as our core capability. It is the highest-impact, lowest-cost intervention for data-driven prioritization. Identifying schools near conflict clusters provides an immediate "red flag" system that can trigger field assessments or preparedness measures before a school is forced to close.</p>
+        
+        <h3>Methodology</h3>
+        <p>Our approach overlays the <strong>ACLED (Conflict)</strong> database with <strong>HOT-OSM/UNICEF (Infrastructure)</strong> locations. We use a geospatial "nearest-neighbor" analysis to classify every school facility based on its distance to the most recent violent event. This logic is scalable—it can be applied to health clinics, water points, or displacement camps with minimal adjustment.</p>
+        
+        <h3>AI-Enhanced Efficiency</h3>
+        <p>We leverage AI (Gemini CLI) to automate the technical "heavy lifting." This includes cleaning diverse datasets from HDX and ACLED and generating the complex geospatial calculations (Haversine formula) required to map thousands of points. This reduces the technical barrier for EBI, allowing staff to focus on strategic decisions rather than data engineering.</p>
+
+        <h2>4. Proposed Activities</h2>
+        <ul>
+            <li><strong>Pilot Risk Mapping:</strong> Conduct a comprehensive mapping of 17,000+ school facilities across Burkina Faso, Mali, and Niger, identifying the subset currently at "Critical Risk" (within 5km of conflict).</li>
+            <li><strong>Interactive Dashboard Deployment:</strong> Launch a web-based dashboard that tracks conflict trends (fatalities, event types) and school vulnerability, providing a "common operating picture" for regional coordination.</li>
+            <li><strong>Methodology Handover:</strong> Document the data pipeline in a reproducible format, ensuring EBI technical staff can refresh the data monthly without external assistance.</li>
+        </ul>
+
+        <h2>5. Deliverables</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Deliverable</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Risk-Classified GeoJSONs</strong></td>
+                    <td>A standardized database of schools tagged with their risk status (At-Risk vs. Safe) and precise conflict proximity.</td>
+                </tr>
+                <tr>
+                    <td><strong>Interactive Risk Portal</strong></td>
+                    <td>A mobile-responsive web map and analytics dashboard for operational use by EBI field and headquarter staff.</td>
+                </tr>
+                <tr>
+                    <td><strong>Automated Data Pipeline</strong></td>
+                    <td>A suite of Python scripts for data filtering, cleaning, and risk calculation to ensure long-term maintenance.</td>
+                </tr>
+                <tr>
+                    <td><strong>Methodology Documentation</strong></td>
+                    <td>A step-by-step guide detailing data sources, calculation logic, and update procedures.</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p>UNITO ICT4D Crash Course 1 | Proposal Strategy 2026</p>
+    </footer>
+</body>
+</html>
