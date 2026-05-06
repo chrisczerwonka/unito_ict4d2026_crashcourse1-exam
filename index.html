@@ -15,11 +15,23 @@
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
         }
+        .map-title {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
+    <div class="map-title">Sahel: Education in Crisis</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Include all data files -->
@@ -30,20 +42,20 @@
     <script>
         const map = L.map('map').setView([15.0, 1.0], 5);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Add gray overlay for non-focus areas
+        const grayOverlay = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            opacity: 0.3
         }).addTo(map);
 
-        // 1. Conflict Events Layer (Orange/Red circles based on fatalities)
+        // 1. Conflict Events Layer
         const conflictLayer = L.layerGroup();
         eventData.forEach(event => {
             const radius = Math.sqrt(event.FATALITIES) * 3 + 3;
             L.circleMarker([event.CENTROID_LATITUDE, event.CENTROID_LONGITUDE], {
                 radius: radius,
                 fillColor: "#e67e22",
-                color: "#d35400",
-                weight: 1,
-                opacity: 1,
+                color: "transparent",
                 fillOpacity: 0.6
             })
             .bindPopup(`
@@ -55,11 +67,11 @@
             .addTo(conflictLayer);
         });
 
-        // 2. At-Risk Schools Layer (Red Dots)
+        // 2. At-Risk Schools Layer (Purple)
         const atRiskLayer = L.geoJSON(atRiskData, {
             pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
                 radius: 4,
-                fillColor: "#ff0000",
+                fillColor: "#8e44ad",
                 color: "#000",
                 weight: 0.5,
                 opacity: 1,
@@ -67,14 +79,14 @@
             }),
             onEachFeature: (feature, layer) => {
                 layer.bindPopup(`
-                    <strong style="color:red">AT-RISK SCHOOL</strong><br>
+                    <strong style="color:purple">AT-RISK SCHOOL</strong><br>
                     Name: ${feature.properties.name}<br>
                     Dist. to Conflict: ${feature.properties.distance_to_nearest_conflict} km
                 `);
             }
         });
 
-        // 3. Safe Schools Layer (Green Dots)
+        // 3. Safe Schools Layer (Green)
         const safeLayer = L.geoJSON(safeData, {
             pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
                 radius: 3,
@@ -101,7 +113,7 @@
         // 4. Layer Control
         const overlayMaps = {
             "Conflict Events": conflictLayer,
-            "<span style='color:red'>At-Risk Schools (within 5km)</span>": atRiskLayer,
+            "<span style='color:purple'>At-Risk Schools (within 5km)</span>": atRiskLayer,
             "<span style='color:green'>Safe Schools (>5km)</span>": safeLayer
         };
         L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
@@ -112,7 +124,7 @@
             const div = L.DomUtil.create('div', 'legend');
             div.innerHTML += '<b>Legend</b><br>';
             div.innerHTML += '<i style="background: #e67e22; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Event<br>';
-            div.innerHTML += '<i style="background: #ff0000; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> At-Risk School<br>';
+            div.innerHTML += '<i style="background: #8e44ad; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> At-Risk School<br>';
             div.innerHTML += '<i style="background: #2ecc71; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Safe School';
             return div;
         };
