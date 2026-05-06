@@ -21,7 +21,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
 # 1. Load data
 print("Loading data...")
-conflict_df = pd.read_csv('data/cleaned/ACLED_Central_Sahel_filtered.csv')
+conflict_df = pd.read_csv('data/cleaned/acled-sahel-filtered.csv')
 with open('data/processed/schools_combined.geojson', 'r') as f:
     schools_data = json.load(f)
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
 # 1. Tell the computer where the files are
-input_file = 'data/raw/ACLED_Africa_aggregated_data_up_to_week_of-2026-04-25.csv'
+input_file = 'data/raw/acled-africa-aggregated.csv'
 output_file = 'data/cleaned/ACLED_Central_Sahel_filtered.csv'
 
 print(f"Reading the big data file: {input_file}...")
