@@ -3,38 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahel: Schools at Risk</title>
+    <title>SAHEL SENTINEL | Risk Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        #map { height: 100vh; width: 100%; }
-        body { margin: 0; padding: 0; }
+        :root {
+            --bg-dark: #0f172a;
+            --accent-cyan: #22d3ee;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .nav-brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-cyan);
+        }
+
+        /* Map Container */
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Map UI Elements */
+        .leaflet-bar { border: 1px solid var(--border) !important; box-shadow: none !important; }
+        .leaflet-bar a { background: var(--bg-dark) !important; color: var(--accent-cyan) !important; border-bottom: 1px solid var(--border) !important; }
+        
         .legend {
-            padding: 10px;
-            background: white;
-            line-height: 1.5em;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            line-height: 1.8em;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.85rem;
         }
-        .map-title {
+
+        .legend b { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; }
+
+        .map-overlay-title {
             position: absolute;
-            top: 10px;
-            left: 50px;
+            top: 20px;
+            left: 60px;
             z-index: 1000;
-            background: rgba(255,255,255,0.8);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
             font-weight: bold;
+            color: var(--accent-cyan);
+            pointer-events: none;
         }
+
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .leaflet-popup-tip { background: var(--bg-dark); }
     </style>
 </head>
 <body>
 
+    <nav>
+        <a href="../index.html" class="nav-brand">SAHEL_SENTINEL.v1</a>
+        <div class="nav-links">
+            <a href="../index.html">Overview</a>
+            <a href="../proposal-strategy-section/">Strategy</a>
+            <a href="index.html" class="active">Risk Map</a>
+            <a href="../dashboard/">Analytics</a>
+        </div>
+    </nav>
+
     <div id="map"></div>
-    <div class="map-title">Sahel: Education in Crisis</div>
+    <div class="map-overlay-title">GEOSPATIAL_INTEL // PROXIMITY_ANALYSIS</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Include all data files -->
     <script src="../data/processed/map-data.js"></script>
     <script src="../data/processed/at-risk-data.js"></script>
     <script src="../data/processed/safe-data.js"></script>
@@ -42,121 +137,94 @@
     <script>
         const map = L.map('map').setView([14.0, 1.0], 6);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Dark mode tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
 
-        // State for active countries
-        let activeCountries = {
-            "Burkina Faso": true,
-            "Mali": true,
-            "Niger": true
-        };
-
-        // Function to update map layers based on country filter
-        function updateMap() {
-            // Remove old layers
-            [conflictLayer, atRiskLayer, safeLayer].forEach(l => l.clearLayers());
-
-            // Re-add based on filter
-            // ... (Logic to filter data in the layers) ...
-        }
-
-        // Add filter control
-        const filterControl = L.control({position: 'topright'});
-        filterControl.onAdd = function(map) {
-            const div = L.DomUtil.create('div', 'legend');
-            div.innerHTML = '<b>Filter by Country</b><br>';
-            Object.keys(activeCountries).forEach(country => {
-                div.innerHTML += `<label><input type="checkbox" checked onchange="toggleCountry('${country}')"> ${country}</label><br>`;
-            });
-            return div;
-        };
-        filterControl.addTo(map);
-
-        function toggleCountry(country) {
-            activeCountries[country] = !activeCountries[country];
-            // Re-filter and refresh layers
-        }
-
-        // 1. Conflict Events Layer
+        // Conflict Events Layer
         const conflictLayer = L.layerGroup();
         eventData.forEach(event => {
-            const radius = Math.sqrt(event.FATALITIES) * 3 + 3;
+            const radius = Math.sqrt(event.FATALITIES) * 3 + 4;
             L.circleMarker([event.CENTROID_LATITUDE, event.CENTROID_LONGITUDE], {
                 radius: radius,
-                fillColor: "#e67e22",
+                fillColor: "#f97316",
                 color: "transparent",
                 fillOpacity: 0.6
             })
             .bindPopup(`
-                <b>Conflict Event</b><br>
-                Date: ${event.WEEK}<br>
-                Type: ${event.EVENT_TYPE}<br>
-                Fatalities: ${event.FATALITIES}
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                    <b style="color:#f97316">CONFLICT_EVENT</b><br>
+                    DATE: ${event.WEEK}<br>
+                    TYPE: ${event.EVENT_TYPE}<br>
+                    FATALITIES: ${event.FATALITIES}
+                </div>
             `)
             .addTo(conflictLayer);
         });
 
-        // 2. At-Risk Schools Layer (Purple)
+        // At-Risk Schools Layer (Cyan/Neon)
         const atRiskLayer = L.geoJSON(atRiskData, {
             pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
                 radius: 4,
-                fillColor: "#8e44ad",
-                color: "#000",
+                fillColor: "#22d3ee",
+                color: "#fff",
                 weight: 0.5,
                 opacity: 1,
                 fillOpacity: 0.9
             }),
             onEachFeature: (feature, layer) => {
                 layer.bindPopup(`
-                    <strong style="color:purple">AT-RISK SCHOOL</strong><br>
-                    Name: ${feature.properties.name}<br>
-                    Dist. to Conflict: ${feature.properties.distance_to_nearest_conflict} km
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                        <b style="color:#22d3ee">AT_RISK_FACILITY</b><br>
+                        NAME: ${feature.properties.name}<br>
+                        PROXIMITY: ${feature.properties.distance_to_nearest_conflict} KM
+                    </div>
                 `);
             }
         });
 
-        // 3. Safe Schools Layer (Green)
+        // Safe Schools Layer (Dimmed Slate)
         const safeLayer = L.geoJSON(safeData, {
             pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
                 radius: 3,
-                fillColor: "#2ecc71",
+                fillColor: "#475569",
                 color: "#000",
                 weight: 0.5,
-                opacity: 1,
-                fillOpacity: 0.7
+                opacity: 0.6,
+                fillOpacity: 0.5
             }),
             onEachFeature: (feature, layer) => {
                 layer.bindPopup(`
-                    <strong style="color:green">Safe School</strong><br>
-                    Name: ${feature.properties.name}<br>
-                    Dist. to Conflict: ${feature.properties.distance_to_nearest_conflict} km
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                        <b style="color:#94a3b8">SAFE_FACILITY</b><br>
+                        NAME: ${feature.properties.name}<br>
+                        PROXIMITY: ${feature.properties.distance_to_nearest_conflict} KM
+                    </div>
                 `);
             }
         });
 
-        // Add all layers to map by default
         conflictLayer.addTo(map);
         atRiskLayer.addTo(map);
         safeLayer.addTo(map);
 
-        // 4. Layer Control
         const overlayMaps = {
-            "Conflict Events": conflictLayer,
-            "<span style='color:purple'>At-Risk Schools (within 5km)</span>": atRiskLayer,
-            "<span style='color:green'>Safe Schools (>5km)</span>": safeLayer
+            "<span style='color:#f97316'>Conflict Clusters</span>": conflictLayer,
+            "<span style='color:#22d3ee'>At-Risk Facilities (&lt;5km)</span>": atRiskLayer,
+            "<span style='color:#475569'>Safe Facilities (&gt;5km)</span>": safeLayer
         };
         L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
 
-        // 5. Legend
         const legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             const div = L.DomUtil.create('div', 'legend');
-            div.innerHTML += '<b>Legend</b><br>';
-            div.innerHTML += '<i style="background: #e67e22; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Event<br>';
-            div.innerHTML += '<i style="background: #8e44ad; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> At-Risk School<br>';
-            div.innerHTML += '<i style="background: #2ecc71; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Safe School';
+            div.innerHTML += '<b>LEGEND</b><br>';
+            div.innerHTML += '<i style="background: #f97316; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Cluster<br>';
+            div.innerHTML += '<i style="background: #22d3ee; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> At-Risk School<br>';
+            div.innerHTML += '<i style="background: #475569; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Safe School';
             return div;
         };
         legend.addTo(map);

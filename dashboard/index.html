@@ -2,32 +2,139 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sahel Conflict Dashboard</title>
+    <title>SAHEL SENTINEL | Operational Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --accent-cyan: #22d3ee;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-cyan);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            max-height: 300px;
+        }
     </style>
 </head>
 <body>
-    <h1>Sahel Conflict Analysis Dashboard</h1>
-    <div class="grid">
-        <div class="card"><canvas id="chart1"></canvas></div>
-        <div class="card"><canvas id="chart2"></canvas></div>
-        <div class="card"><canvas id="chart3"></canvas></div>
-        <div class="card"><canvas id="chart4"></canvas></div>
+
+    <nav>
+        <a href="../index.html" class="nav-brand">SAHEL_SENTINEL.v1</a>
+        <div class="nav-links">
+            <a href="../index.html">Overview</a>
+            <a href="../proposal-strategy-section/">Strategy</a>
+            <a href="../map/">Risk Map</a>
+            <a href="index.html" class="active">Analytics</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>OPERATIONAL_ANALYTICS // CONFLICT_TELEMETRY</h1>
+        <div class="grid">
+            <div class="card"><canvas id="chart1"></canvas></div>
+            <div class="card"><canvas id="chart2"></canvas></div>
+            <div class="card"><canvas id="chart3"></canvas></div>
+            <div class="card"><canvas id="chart4"></canvas></div>
+        </div>
     </div>
 
     <script>
         const csvPath = '../data/cleaned/acled-sahel-filtered.csv';
+        
+        // Chart defaults for dark mode
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#334155';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
         Papa.parse(csvPath, {
             download: true, header: true, dynamicTyping: true,
             complete: function(results) {
                 const data = results.data;
                 
-                // Aggregations
                 const yearlyEvents = {}, yearlyFatalities = {}, eventTypes = {}, regions = {};
                 data.forEach(row => {
                     if (!row.WEEK) return;
@@ -39,30 +146,35 @@
                     regions[regKey] = (regions[regKey] || 0) + 1;
                 });
 
-                // Chart 1: Events per Year
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, color: '#22d3ee', font: { family: "'JetBrains Mono', monospace", size: 14 } }
+                    }
+                };
+
                 new Chart(document.getElementById('chart1'), {
-                    type: 'bar', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Events', data: Object.values(yearlyEvents), backgroundColor: '#3498db' }] },
-                    options: { plugins: { title: { display: true, text: 'Conflict Events per Year' } } }
+                    type: 'bar', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Events', data: Object.values(yearlyEvents), backgroundColor: '#3b82f6' }] },
+                    options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'EVENT_VOLUME_BY_YEAR' } } }
                 });
 
-                // Chart 2: Severity (Fatalities/Events) over time
                 const severity = Object.keys(yearlyEvents).map(y => (yearlyFatalities[y] / yearlyEvents[y]).toFixed(2));
                 new Chart(document.getElementById('chart2'), {
-                    type: 'line', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Avg Fatalities', data: severity, borderColor: '#e67e22', tension: 0.1 }] },
-                    options: { plugins: { title: { display: true, text: 'Avg Severity (Fatalities) per Year' } } }
+                    type: 'line', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Avg Fatalities', data: severity, borderColor: '#f97316', backgroundColor: '#f97316', tension: 0.1 }] },
+                    options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'AVG_SEVERITY_INDEX' } } }
                 });
 
-                // Chart 3: Causes
                 new Chart(document.getElementById('chart3'), {
-                    type: 'pie', data: { labels: Object.keys(eventTypes), datasets: [{ data: Object.values(eventTypes), backgroundColor: ['#f1c40f', '#e74c3c', '#9b59b6', '#34495e'] }] },
-                    options: { plugins: { title: { display: true, text: 'Conflict Causes' } } }
+                    type: 'pie', data: { labels: Object.keys(eventTypes), datasets: [{ data: Object.values(eventTypes), backgroundColor: ['#22d3ee', '#3b82f6', '#818cf8', '#6366f1', '#4f46e5'] }] },
+                    options: { ...commonOptions, plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'CONFLICT_TYPE_DISTRIBUTION' } } }
                 });
 
-                // Chart 4: Top 10 Regions
                 const topRegions = Object.entries(regions).sort((a,b) => b[1]-a[1]).slice(0, 10);
                 new Chart(document.getElementById('chart4'), {
-                    type: 'bar', data: { labels: topRegions.map(r => r[0]), datasets: [{ label: 'Events', data: topRegions.map(r => r[1]), backgroundColor: '#2ecc71' }] },
-                    options: { indexAxis: 'y', plugins: { title: { display: true, text: 'Top 10 Affected Regions' } } }
+                    type: 'bar', data: { labels: topRegions.map(r => r[0]), datasets: [{ label: 'Events', data: topRegions.map(r => r[1]), backgroundColor: '#22d3ee' }] },
+                    options: { ...commonOptions, indexAxis: 'y', plugins: { ...commonOptions.plugins, title: { ...commonOptions.plugins.title, text: 'TOP_10_HIGH_RISK_REGIONS' } } }
                 });
             }
         });
