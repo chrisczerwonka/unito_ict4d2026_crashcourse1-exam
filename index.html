@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahel Conflict Map (Fatalities)</title>
+    <title>Sahel: Schools at Risk</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         #map { height: 100vh; width: 100%; }
@@ -22,46 +22,98 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Include all data files -->
     <script src="data/processed/map_data.js"></script>
+    <script src="data/processed/at_risk_data.js"></script>
+    <script src="data/processed/safe_data.js"></script>
 
     <script>
-        // 1. Initialize the map
         const map = L.map('map').setView([15.0, 1.0], 5);
 
-        // 2. Add background tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // 3. Add conflict events
+        // 1. Conflict Events Layer (Orange/Red circles based on fatalities)
+        const conflictLayer = L.layerGroup();
         eventData.forEach(event => {
-            // Circle size based on fatalities
-            // We use a small base size (3) plus a multiplier for fatalities
             const radius = Math.sqrt(event.FATALITIES) * 3 + 3;
-
             L.circleMarker([event.CENTROID_LATITUDE, event.CENTROID_LONGITUDE], {
                 radius: radius,
-                fillColor: "#e74c3c", // Red for fatalities
-                color: "#c0392b",
+                fillColor: "#e67e22",
+                color: "#d35400",
                 weight: 1,
                 opacity: 1,
-                fillOpacity: 0.7
+                fillOpacity: 0.6
             })
-            .addTo(map)
             .bindPopup(`
-                <b>Date:</b> ${event.WEEK}<br>
-                <b>Event Type:</b> ${event.EVENT_TYPE}<br>
-                <b>Fatalities:</b> ${event.FATALITIES}
-            `);
+                <b>Conflict Event</b><br>
+                Date: ${event.WEEK}<br>
+                Type: ${event.EVENT_TYPE}<br>
+                Fatalities: ${event.FATALITIES}
+            `)
+            .addTo(conflictLayer);
         });
 
-        // 4. Add a simple legend
+        // 2. At-Risk Schools Layer (Red Dots)
+        const atRiskLayer = L.geoJSON(atRiskData, {
+            pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+                radius: 4,
+                fillColor: "#ff0000",
+                color: "#000",
+                weight: 0.5,
+                opacity: 1,
+                fillOpacity: 0.9
+            }),
+            onEachFeature: (feature, layer) => {
+                layer.bindPopup(`
+                    <strong style="color:red">AT-RISK SCHOOL</strong><br>
+                    Name: ${feature.properties.name}<br>
+                    Dist. to Conflict: ${feature.properties.distance_to_nearest_conflict} km
+                `);
+            }
+        });
+
+        // 3. Safe Schools Layer (Green Dots)
+        const safeLayer = L.geoJSON(safeData, {
+            pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+                radius: 3,
+                fillColor: "#2ecc71",
+                color: "#000",
+                weight: 0.5,
+                opacity: 1,
+                fillOpacity: 0.7
+            }),
+            onEachFeature: (feature, layer) => {
+                layer.bindPopup(`
+                    <strong style="color:green">Safe School</strong><br>
+                    Name: ${feature.properties.name}<br>
+                    Dist. to Conflict: ${feature.properties.distance_to_nearest_conflict} km
+                `);
+            }
+        });
+
+        // Add all layers to map by default
+        conflictLayer.addTo(map);
+        atRiskLayer.addTo(map);
+        safeLayer.addTo(map);
+
+        // 4. Layer Control
+        const overlayMaps = {
+            "Conflict Events": conflictLayer,
+            "<span style='color:red'>At-Risk Schools (within 5km)</span>": atRiskLayer,
+            "<span style='color:green'>Safe Schools (>5km)</span>": safeLayer
+        };
+        L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
+
+        // 5. Legend
         const legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             const div = L.DomUtil.create('div', 'legend');
             div.innerHTML += '<b>Legend</b><br>';
-            div.innerHTML += '<i style="background: #e74c3c; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Event<br>';
-            div.innerHTML += '<small>Circle size = Number of fatalities</small>';
+            div.innerHTML += '<i style="background: #e67e22; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Event<br>';
+            div.innerHTML += '<i style="background: #ff0000; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> At-Risk School<br>';
+            div.innerHTML += '<i style="background: #2ecc71; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Safe School';
             return div;
         };
         legend.addTo(map);
