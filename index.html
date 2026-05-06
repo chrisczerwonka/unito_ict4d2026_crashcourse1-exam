@@ -3,45 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahel Conflict Map</title>
-    <!-- 1. Include Leaflet's CSS (the styling for the map) -->
+    <title>Sahel Conflict & Schools Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* 2. Set the size of the map */
         #map {
-            height: 100vh; /* Full screen height */
+            height: 100vh;
             width: 100%;
         }
         body { margin: 0; padding: 0; }
+        .legend {
+            padding: 10px;
+            background: white;
+            line-height: 1.5em;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
-    <!-- 3. The div where the map will live -->
     <div id="map"></div>
 
-    <!-- 4. Include Leaflet's JavaScript library -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- 5. Include our data file -->
+    <!-- Include both data files -->
     <script src="data/processed/map_data.js"></script>
+    <script src="data/processed/school_data.js"></script>
 
     <script>
-        // 6. Initialize the map and center it on the Sahel (approx 15N, 1E)
         const map = L.map('map').setView([15.0, 1.0], 5);
 
-        // 7. Add the background "tiles" (the actual map image)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // 8. Loop through each event in our data
-        eventData.forEach(event => {
-            // Calculate circle size based on population exposure
-            // We use Math.sqrt to make the size look more natural
-            const radius = Math.sqrt(event.POPULATION_EXPOSURE) / 10 + 2;
+        // 1. Create a "Layer Group" for Schools
+        const schoolLayer = L.geoJSON(schoolData, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 3,
+                    fillColor: "#3388ff",
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 1,
+                    fillOpacity: 0.6
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(`
+                    <strong>School:</strong> ${feature.properties.name}<br>
+                    <strong>Type:</strong> ${feature.properties.type}<br>
+                    <strong>Country:</strong> ${feature.properties.country}
+                `);
+            }
+        }).addTo(map);
 
-            // Create a circle for the event
+        // 2. Add Conflict Events
+        const conflictLayer = L.layerGroup();
+        eventData.forEach(event => {
+            const radius = Math.sqrt(event.POPULATION_EXPOSURE) / 10 + 2;
             L.circleMarker([event.CENTROID_LATITUDE, event.CENTROID_LONGITUDE], {
                 radius: radius,
                 fillColor: "#ff7800",
@@ -50,15 +69,35 @@
                 opacity: 1,
                 fillOpacity: 0.8
             })
-            .addTo(map)
-            // Add the popup with details
             .bindPopup(`
                 <b>Date:</b> ${event.WEEK}<br>
                 <b>Type:</b> ${event.EVENT_TYPE}<br>
                 <b>Subtype:</b> ${event.SUB_EVENT_TYPE}<br>
                 <b>Fatalities:</b> ${event.FATALITIES}
-            `);
+            `)
+            .addTo(conflictLayer);
         });
+        conflictLayer.addTo(map);
+
+        // 3. Add a Toggle Control (top right)
+        const overlayMaps = {
+            "Schools (Blue Dots)": schoolLayer,
+            "Conflict Events (Orange circles)": conflictLayer
+        };
+        L.control.layers(null, overlayMaps).addTo(map);
+
+        // 4. Add a Legend (bottom right)
+        const legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML += '<b>Legend</b><br>';
+            div.innerHTML += '<i style="background: #3388ff; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> School<br>';
+            div.innerHTML += '<i style="background: #ff7800; border-radius: 50%; width: 10px; height: 10px; display: inline-block;"></i> Conflict Event<br>';
+            div.innerHTML += '<small>Circle size = Population exposure</small>';
+            return div;
+        };
+        legend.addTo(map);
+
     </script>
 </body>
 </html>
