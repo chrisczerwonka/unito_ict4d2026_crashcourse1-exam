@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahel Conflict Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1>Sahel Conflict Analysis Dashboard</h1>
+    <div class="grid">
+        <div class="card"><canvas id="chart1"></canvas></div>
+        <div class="card"><canvas id="chart2"></canvas></div>
+        <div class="card"><canvas id="chart3"></canvas></div>
+        <div class="card"><canvas id="chart4"></canvas></div>
+    </div>
+
+    <script>
+        // Note: For a real dashboard, we would load the CSV here.
+        // Given the environment constraints, this is a placeholder implementation.
+        console.log("Dashboard initialized. Data integration would happen here.");
+    </script>
+</body>
+</html>
