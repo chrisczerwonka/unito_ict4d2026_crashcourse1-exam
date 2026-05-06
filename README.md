@@ -1,100 +1,89 @@
-# Education Continuity Risk Mapping in Conflict-Affected WAEMU/UEMOA Regions
+# 🗺️ Sahel Education Continuity Risk Portal (2026)
 
-**ICT for Civic Data Crash Course 2026 – Exam Project**
+**ICT for Civic Data Crash Course – Exam Project | Response to Education Bridge Initiative (EBI) RFP**
 
-## Project Overview
-This project explores how open geospatial data, conflict-event monitoring, and lightweight civic-data tools can support education continuity planning in conflict-affected WAEMU/UEMOA countries [cite: 11, 14].
-
-The project focuses primarily on **Burkina Faso**, with regional references to **Niger** and **Mali**, to identify areas where insecurity, displacement, and infrastructure vulnerability may disrupt access to education [cite: 4, 16]. Using open datasets and simple geospatial analysis, the project demonstrates how humanitarian organizations can complement field expertise with data-driven prioritization and visualization tools [cite: 11, 69, 96].
-
-The work was developed as part of the **ICT for Civic Data Crash Course 2026** exam assignment, which required:
-- A visual artifact
-- A proposal strategy section
-- Transparent access to the underlying data pipeline
+This project provides a technical framework for mapping education continuity risk in the conflict-affected WAEMU/UEMOA regions, primarily focusing on **Burkina Faso**, **Mali**, and **Niger**. It demonstrates how open geospatial data and conflict-event monitoring can be transformed into actionable insights for humanitarian prioritization.
 
 ---
 
-## Research Question
-**How can open geospatial data and conflict-event monitoring help humanitarian organizations identify schools and communities at elevated risk of education disruption in conflict-affected WAEMU/UEMOA regions?** [cite: 11, 27]
-
-### Secondary Questions:
-- Which schools are located near conflict-event clusters? [cite: 28]
-- Which regions combine high child population vulnerability with low education access? [cite: 30]
-- How can lightweight maps and dashboards improve operational prioritization for non-technical humanitarian staff? [cite: 51, 69, 94]
-- How can open data complement existing field knowledge rather than replace it? [cite: 96]
+## 🚀 Live Visual Artifacts
+*   **[Interactive Risk Map](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/map/)** – Visualize school facilities and their proximity to conflict events.
+*   **[Conflict Analysis Dashboard](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/dashboard/)** – Explore regional trends, fatalities, and event types across the Central Sahel.
 
 ---
 
-## Project Angle
-This project argues that education continuity monitoring systems can serve as a foundational resilience layer for humanitarian education programming [cite: 12, 14, 92].
+## 🌍 Project Overview & Strategic Intent
+Conflict in the Sahel creates systemic disruptions to education. This project answers the call for **timely, localized, and operationally actionable information** to help EBI and local authorities prioritize interventions.
 
-Rather than relying solely on fragmented field reporting, organizations can combine:
-- Conflict-event datasets [cite: 66]
-- School infrastructure data [cite: 67]
-- Population and displacement estimates [cite: 68]
-- Geospatial analysis [cite: 11, 27]
+### Research Question
+> **How can open geospatial data and conflict-event monitoring help humanitarian organizations identify schools and communities at elevated risk of education disruption in conflict-affected WAEMU/UEMOA regions?**
 
-...to improve prevention, preparedness, and response planning for vulnerable communities [cite: 25, 85]. The approach emphasizes open datasets, low-cost tooling, reproducible workflows, and accessible outputs for non-technical users [cite: 65, 69].
-
----
-
-## Countries Covered
-- **Primary focus:** Burkina Faso [cite: 4, 61]
-- **Secondary regional context:** Niger and Mali [cite: 4, 62, 63]
-- **Optional spillover analysis:** Northern Benin border regions [cite: 4, 64]
+### Key Objectives:
+- Identify schools within high-risk "proximity zones" (5km) of recent conflict events.
+- Aggregate regional conflict trends to inform macro-level resource allocation.
+- Provide a reproducible, lightweight data pipeline for non-technical humanitarian staff.
 
 ---
 
-## Data Pipeline
-The project followed the civic-data pipeline framework:
-
-1.  **Define:** Defined the operational humanitarian question and proposal angle [cite: 1].
-2.  **Find:** Identified open datasets related to conflict events, schools, population distribution, and administrative boundaries.
-3.  **Get:** Downloaded and organized raw datasets into a structured repository.
-4.  **Verify:** Checked geographic validity, duplicate records, coordinate consistency, and dataset completeness.
-5.  **Clean:** Used spreadsheet workflows and OpenRefine to standardize names and normalize geographic fields.
-6.  **Analyse:** Combined datasets to identify schools near conflict concentrations and regional vulnerability patterns [cite: 27, 37].
-7.  **Present:** Published maps, dashboards, and documentation using GitHub Pages [cite: 69].
+## 🛠️ Methodology & Risk Assessment
+The project employs a **Proximity-Based Risk Model**:
+1.  **Data Integration:** Merging ACLED conflict event data with school infrastructure points (HOT-OSM/UNICEF).
+2.  **Geospatial Analysis:** A Python-based Haversine calculation determines the absolute nearest conflict event for every recorded school.
+3.  **Classification:**
+    *   🟣 **At-Risk:** Schools within **5.0 km** of a conflict event.
+    *   🟢 **Safe:** Schools further than 5.0 km from recorded incidents.
+4.  **Normalization:** Conflict severity is visualized through fatalities-weighted marker clustering.
 
 ---
 
-## Tools and Platforms Used
-| Tool | Purpose |
-| :--- | :--- |
-| GitHub Codespaces | Development environment |
-| GeminiCLI | AI-assisted coding and workflow support |
-| OpenRefine | Data cleaning and normalization |
-| Google Sheets | Manual verification and spreadsheet analysis |
-| Leaflet | Interactive mapping |
-| Chart.js | Dashboard visualizations |
-| GitHub Pages | Project publishing |
-| v0 by Vercel | UI prototyping and layout support |
-| DataViz Catalogue | Visualization planning reference |
-
----
-
-## Datasets Used
-| Dataset | Source | Format | Purpose |
-| :--- | :--- | :--- | :--- |
-| **ACLED Conflict Events** | [acleddata.com](https://acleddata.com) | CSV | Conflict-event locations and severity [cite: 66] |
-| **OpenStreetMap Schools** | [openstreetmap.org](https://www.openstreetmap.org) | GeoJSON | School locations [cite: 67] |
-| **Admin Boundaries** | [HDX](https://data.humdata.org/) | GeoJSON | Regional mapping layers |
-| **Population Estimates** | [WorldPop](https://www.worldpop.org/) | CSV | Population vulnerability context [cite: 68] |
-| **Displacement Data** | UNHCR / IOM | CSV | Displacement and vulnerability overlays [cite: 68] |
-
----
-
-## Repository Structure
+## 📁 Repository Architecture
 ```text
 .
-├── data/
-│   ├── raw/
-│   ├── cleaned/
-│   └── processed/
-├── maps/
-├── dashboard/
-├── scripts/
-├── docs/
-├── index.html
-└── README.md
+├── 📊 data/
+│   ├── raw/           # Unmodified source files (ACLED, OSM)
+│   ├── cleaned/       # Standardized CSVs via OpenRefine/Python
+│   └── processed/     # GeoJSON outputs for web visualization
+├── 🗺️ map/             # Leaflet.js interactive mapping interface
+├── 📈 dashboard/       # Chart.js conflict analytics dashboard
+├── 🐍 scripts/         # Python automation for filtering and analysis
+├── 📄 docs/            # Methodology, data sources, and strategy notes
+└── index.html         # Project landing page
 ```
+
+---
+
+## ⚙️ Data Pipeline & Reproducibility
+To reproduce the analysis or update the data:
+
+1.  **Filter Data:** Run the country-level filter on raw ACLED data.
+    ```bash
+    python3 scripts/filter_sahel_data.py
+    ```
+2.  **Analyze Risk:** Run the geospatial proximity analysis.
+    ```bash
+    python3 scripts/analyze_school_risk.py
+    ```
+3.  **Deploy:** The outputs in `data/processed/` are automatically consumed by the Map and Dashboard.
+
+---
+
+## 📊 Data Attribution & Licenses
+| Dataset | Source | License | Role |
+| :--- | :--- | :--- | :--- |
+| **Conflict Events** | [ACLED](https://acleddata.com) | [Creative Commons](https://acleddata.com/curated-data-files/) | Primary risk indicator |
+| **School Locations** | [HOT-OSM](https://data.humdata.org/) | [ODbL](https://opendatacommons.org/licenses/odbl/) | Infrastructure baseline |
+| **Admin Boundaries** | [OCHA/HDX](https://data.humdata.org/) | [CC-BY-IGO](https://creativecommons.org/licenses/by/3.0/igo/) | Geospatial containment |
+| **Population** | [WorldPop](https://www.worldpop.org/) | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Vulnerability context |
+
+---
+
+## 🧠 AI Disclosure & Ethics
+This project was developed using **Gemini CLI** and **v0.dev** as high-level pair-programming assistants. 
+
+*   **Role of AI:** Assisted in drafting Python geospatial logic (Haversine formula), boilerplate HTML/CSS for the dashboard, and repository standardization.
+*   **Human Oversight:** Every line of code and data point was manually verified for geographic accuracy and humanitarian context. No "black-box" AI logic was used for the actual risk classification; the 5km threshold is a user-defined humanitarian parameter.
+
+---
+
+## 📄 License
+This repository is licensed under the **MIT License**. The underlying datasets remain subject to the licenses provided by their respective authors (see Attribution section).
