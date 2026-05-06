@@ -1,4 +1,4 @@
-# 🗺️ Sahel Education Continuity Risk Portal (2026)
+# 🗺️ Sahel Edu-Continuity Hub (2026)
 
 **ICT for Civic Data Crash Course – Exam Project | Response to Education Bridge Initiative (EBI) RFP**
 
