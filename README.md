@@ -7,6 +7,7 @@ This project provides a technical framework for mapping education continuity ris
 ---
 
 ## 🚀 Live Visual Artifacts
+*   **[Project Portal (Landing Page)](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/)** – Central hub for navigating the maps, analytics, and strategy.
 *   **[Interactive Risk Map](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/map/)** – Visualize school facilities and their proximity to conflict events.
 *   **[Conflict Analysis Dashboard](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/dashboard/)** – Explore regional trends, fatalities, and event types across the Central Sahel.
 *   **[Proposal Strategy Section](https://chrisczerwonka.github.io/unito_ict4d2026_crashcourse1-exam/proposal-strategy-section/)** – Detailed response to the EBI RFP, including context, objectives, and methodology.
