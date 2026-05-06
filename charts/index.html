@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sahel Conflict Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
@@ -21,9 +21,51 @@
     </div>
 
     <script>
-        // Note: For a real dashboard, we would load the CSV here.
-        // Given the environment constraints, this is a placeholder implementation.
-        console.log("Dashboard initialized. Data integration would happen here.");
+        const csvPath = '../data/cleaned/ACLED_Central_Sahel_filtered.csv';
+        Papa.parse(csvPath, {
+            download: true, header: true, dynamicTyping: true,
+            complete: function(results) {
+                const data = results.data;
+                
+                // Aggregations
+                const yearlyEvents = {}, yearlyFatalities = {}, eventTypes = {}, regions = {};
+                data.forEach(row => {
+                    if (!row.WEEK) return;
+                    const year = row.WEEK.split('-')[0];
+                    yearlyEvents[year] = (yearlyEvents[year] || 0) + 1;
+                    yearlyFatalities[year] = (yearlyFatalities[year] || 0) + (row.FATALITIES || 0);
+                    eventTypes[row.EVENT_TYPE] = (eventTypes[row.EVENT_TYPE] || 0) + 1;
+                    const regKey = `${row.COUNTRY}: ${row.ADMIN1}`;
+                    regions[regKey] = (regions[regKey] || 0) + 1;
+                });
+
+                // Chart 1: Events per Year
+                new Chart(document.getElementById('chart1'), {
+                    type: 'bar', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Events', data: Object.values(yearlyEvents), backgroundColor: '#3498db' }] },
+                    options: { plugins: { title: { display: true, text: 'Conflict Events per Year' } } }
+                });
+
+                // Chart 2: Severity (Fatalities/Events) over time
+                const severity = Object.keys(yearlyEvents).map(y => (yearlyFatalities[y] / yearlyEvents[y]).toFixed(2));
+                new Chart(document.getElementById('chart2'), {
+                    type: 'line', data: { labels: Object.keys(yearlyEvents), datasets: [{ label: 'Avg Fatalities', data: severity, borderColor: '#e67e22', tension: 0.1 }] },
+                    options: { plugins: { title: { display: true, text: 'Avg Severity (Fatalities) per Year' } } }
+                });
+
+                // Chart 3: Causes
+                new Chart(document.getElementById('chart3'), {
+                    type: 'pie', data: { labels: Object.keys(eventTypes), datasets: [{ data: Object.values(eventTypes), backgroundColor: ['#f1c40f', '#e74c3c', '#9b59b6', '#34495e'] }] },
+                    options: { plugins: { title: { display: true, text: 'Conflict Causes' } } }
+                });
+
+                // Chart 4: Top 10 Regions
+                const topRegions = Object.entries(regions).sort((a,b) => b[1]-a[1]).slice(0, 10);
+                new Chart(document.getElementById('chart4'), {
+                    type: 'bar', data: { labels: topRegions.map(r => r[0]), datasets: [{ label: 'Events', data: topRegions.map(r => r[1]), backgroundColor: '#2ecc71' }] },
+                    options: { indexAxis: 'y', plugins: { title: { display: true, text: 'Top 10 Affected Regions' } } }
+                });
+            }
+        });
     </script>
 </body>
 </html>
