@@ -40,13 +40,36 @@
     <script src="data/processed/safe_data.js"></script>
 
     <script>
-        const map = L.map('map').setView([15.0, 1.0], 5);
+        const map = L.map('map').setView([14.0, 1.0], 6);
 
-        // Add gray overlay for non-focus areas
-        const grayOverlay = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            opacity: 0.3
+        // Add base map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
         }).addTo(map);
+
+        // Styling for focus countries
+        const styleFocus = {
+            "color": "#3498db",
+            "weight": 2,
+            "fillOpacity": 0.0
+        };
+
+        // We will define the focus area in a way that allows us to label it.
+        // For simplicity, we add labels at known approximate centroids.
+        const labels = [
+            { name: "<b>Mali</b>", latlng: [17.5, -3.0] },
+            { name: "<b>Niger</b>", latlng: [17.5, 9.0] },
+            { name: "<b>Burkina Faso</b>", latlng: [12.3, -1.5] }
+        ];
+
+        labels.forEach(l => {
+            L.marker(l.latlng, {
+                icon: L.divIcon({
+                    className: 'country-label',
+                    html: `<div style="font-weight:bold; font-size:14px; color:#2c3e50;">${l.name}</div>`
+                })
+            }).addTo(map);
+        });
 
         // 1. Conflict Events Layer
         const conflictLayer = L.layerGroup();
