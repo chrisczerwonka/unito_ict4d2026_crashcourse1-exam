@@ -57,11 +57,11 @@ To reproduce the analysis or update the data:
 
 1.  **Filter Data:** Run the country-level filter on raw ACLED data.
     ```bash
-    python3 scripts/filter_sahel_data.py
+    python3 scripts/filter-sahel-data.py
     ```
 2.  **Analyze Risk:** Run the geospatial proximity analysis.
     ```bash
-    python3 scripts/analyze_school_risk.py
+    python3 scripts/analyze-school-risk.py
     ```
 3.  **Deploy:** The outputs in `data/processed/` are automatically consumed by the Map and Dashboard.
 

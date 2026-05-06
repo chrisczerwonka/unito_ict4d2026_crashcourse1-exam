@@ -22,7 +22,7 @@ def haversine(lat1, lon1, lat2, lon2):
 # 1. Load data
 print("Loading data...")
 conflict_df = pd.read_csv('data/cleaned/acled-sahel-filtered.csv')
-with open('data/processed/schools_combined.geojson', 'r') as f:
+with open('data/processed/schools-combined.geojson', 'r') as f:
     schools_data = json.load(f)
 
 # Extract conflict coordinates for faster lookup
@@ -73,8 +73,8 @@ def save_geojson(features, filename):
     with open(filename, 'w') as f:
         json.dump(data, f)
 
-save_geojson(at_risk_features, 'data/processed/schools_at_risk.geojson')
-save_geojson(safe_features, 'data/processed/schools_safe.geojson')
+save_geojson(at_risk_features, 'data/processed/schools-at-risk.geojson')
+save_geojson(safe_features, 'data/processed/schools-safe.geojson')
 
 print(f"Analysis Complete!")
 print(f"At-Risk Schools (within 5km): {len(at_risk_features)}")
