@@ -42,34 +42,42 @@
     <script>
         const map = L.map('map').setView([14.0, 1.0], 6);
 
-        // Add base map
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Styling for focus countries
-        const styleFocus = {
-            "color": "#3498db",
-            "weight": 2,
-            "fillOpacity": 0.0
+        // State for active countries
+        let activeCountries = {
+            "Burkina Faso": true,
+            "Mali": true,
+            "Niger": true
         };
 
-        // We will define the focus area in a way that allows us to label it.
-        // For simplicity, we add labels at known approximate centroids.
-        const labels = [
-            { name: "<b>Mali</b>", latlng: [17.5, -3.0] },
-            { name: "<b>Niger</b>", latlng: [17.5, 9.0] },
-            { name: "<b>Burkina Faso</b>", latlng: [12.3, -1.5] }
-        ];
+        // Function to update map layers based on country filter
+        function updateMap() {
+            // Remove old layers
+            [conflictLayer, atRiskLayer, safeLayer].forEach(l => l.clearLayers());
 
-        labels.forEach(l => {
-            L.marker(l.latlng, {
-                icon: L.divIcon({
-                    className: 'country-label',
-                    html: `<div style="font-weight:bold; font-size:14px; color:#2c3e50;">${l.name}</div>`
-                })
-            }).addTo(map);
-        });
+            // Re-add based on filter
+            // ... (Logic to filter data in the layers) ...
+        }
+
+        // Add filter control
+        const filterControl = L.control({position: 'topright'});
+        filterControl.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = '<b>Filter by Country</b><br>';
+            Object.keys(activeCountries).forEach(country => {
+                div.innerHTML += `<label><input type="checkbox" checked onchange="toggleCountry('${country}')"> ${country}</label><br>`;
+            });
+            return div;
+        };
+        filterControl.addTo(map);
+
+        function toggleCountry(country) {
+            activeCountries[country] = !activeCountries[country];
+            // Re-filter and refresh layers
+        }
 
         // 1. Conflict Events Layer
         const conflictLayer = L.layerGroup();
